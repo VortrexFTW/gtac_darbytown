@@ -4,7 +4,7 @@ setErrorMode(RESOURCEERRORMODE_STRICT);
 
 // ----------------------------------------------------------------------------
 
-/* 
+/*
 To-Do:
   - Add race timer and display the score.
   - Store high scores in a array untime the server closes
@@ -13,11 +13,6 @@ To-Do:
   - Add mission failed with a handler to reset everything.
   - Add random DM (police station roof as MTA did)
 */
-
-// ----------------------------------------------------------------------------
-
-// This will be removed on next update for the new property server.maxPlayers
-const MAX_PLAYERS = 35;
 
 // ----------------------------------------------------------------------------
 
@@ -34,9 +29,9 @@ local grey = toColour(180, 180, 180, 255);
 
 // Spawns
 local hospital = [
-[1143,-591,14], // portland
-[182,-18,16], // staunton
-[-1253,-144, 58] // shoreside
+  [1143,-591,14], // portland
+  [182,-18,16], // staunton
+  [-1253,-144, 58] // shoreside
 ];
 
 // ----------------------------------------------------------------------------
@@ -61,13 +56,13 @@ local preEventPosition = array(MAX_PLAYERS, false);
 
 // Commands
 local commandList = [
-  "race", 
+  "race",
   "stats",
-  "die", 
-  "spawncar", 
-  "veh", 
-  "car", 
-  "pos", 
+  "die",
+  "spawncar",
+  "veh",
+  "car",
+  "pos",
   "angle"
 ];
 
@@ -161,10 +156,10 @@ class raceData {
 
             case "C":
               checkpoints.push([Vec3(splitLine[1].tofloat(), splitLine[2].tofloat(), splitLine[3].tofloat()), splitLine[4].tofloat()]);
-              break; 
+              break;
 
             default:
-              break;          
+              break;
           }
         }
       }
@@ -208,15 +203,15 @@ class dmData {
 
             case "W":
               weapons.push([splitLine[1].tointeger(), splitLine[2].tointeger(), Vec3(splitLine[3].tofloat(), splitLine[4].tofloat(), splitLine[5].tofloat())]);
-              break; 
+              break;
 
             default:
-              break;          
+              break;
           }
         }
       }
     }
-  }  
+  }
 }
 
 // ----------------------------------------------------------------------------
@@ -257,15 +252,15 @@ class tdmData {
 
             case "W":
               weapons.push([splitLine[1].tointeger(), splitLine[2].tointeger(), Vec3(splitLine[3].tofloat(), splitLine[4].tofloat(), splitLine[5].tofloat())]);
-              break; 
+              break;
 
             default:
-              break;          
+              break;
           }
         }
       }
     }
-  }  
+  }
 }
 
 // ----------------------------------------------------------------------------
@@ -299,10 +294,10 @@ addEventHandler("onPlayerJoined", function(event, client) {
 
   local select = random(0, 2);
 
-  
-  spawnPlayer(client, Vec3(hospital[select][0], hospital[select][1], hospital[select][2]), 0.0, 0, 0, 0)    
+
+  spawnPlayer(client, Vec3(hospital[select][0], hospital[select][1], hospital[select][2]), 0.0, 0, 0, 0)
   fadeCamera(client,true);
-  
+
   for(local i = 0; i <= 50; i++) {
     messageClient("", client, white);
   }
@@ -347,7 +342,7 @@ addEventHandler("onPedWasted", function(event, wastedPed, killerPed, weaponID, p
   if(killerPed == null) {
     deaths[wastedClient.index]++;
   }
-  
+
   if(killerPed != null) {
     if(killerPed.isType(ELEMENT_PLAYER)) {
       local killerClient = getClientFromPlayerElement(killerPed);
@@ -361,7 +356,7 @@ addEventHandler("onPedWasted", function(event, wastedPed, killerPed, weaponID, p
             killerPed.health = healthCap[killerClient.index];
           }
         }
-      }     
+      }
 
       outputMessage = "🤺 " + killerClient.name + " killed " + wastedClient.name;
     }
@@ -369,9 +364,9 @@ addEventHandler("onPedWasted", function(event, wastedPed, killerPed, weaponID, p
 
   local select = random(0, 2);
 
-  
+
   message(outputMessage, white);
-  spawnPlayer(wastedClient, Vec3(hospital[select][0], hospital[select][1], hospital[select][2]), 0.0, 0, 0, 0)  
+  spawnPlayer(wastedClient, Vec3(hospital[select][0], hospital[select][1], hospital[select][2]), 0.0, 0, 0, 0)
 });
 
 // ----------------------------------------------------------------------------
@@ -390,7 +385,7 @@ addEventHandler("onPedExitVehicle", function(event, ped, vehicle) {
       if(returnToRaceVehicle[client.index][0]) {
         clearInterval(returnToRaceVehicle[client.index][0]);
         returnToRaceVehicle[client.index][0] = false;
-        returnToRaceVehicle[client.index][1] = 0;        
+        returnToRaceVehicle[client.index][1] = 0;
       }
       returnToRaceVehicle[client.index][0] = setInterval(returnToRaceVehicleCounter, 1000, client);
       returnToRaceVehicle[client.index][1] = time();
@@ -427,13 +422,13 @@ function onPlayerCommand( cmd, text, client) {
     client.player.health = 1;
     return true;
   }
-	
+
   if(cmd == "car" || cmd == "veh" || cmd == "spawncar" ) {
     if(!text.tointeger()) {
       messageClient("/" + cmd.tostring() + " <number>", client);
       return false;
     }
-    
+
     local position = getPosInFrontOfPos(client.player.position, client.player.heading, 5);
     gta.createVehicle(text.tointeger(), position, client.player.heading);
   }
@@ -441,7 +436,7 @@ function onPlayerCommand( cmd, text, client) {
   if(cmd == "pos") {
     print(client.player.position.x + "  " + client.player.position.y + "  " + client.player.position.z + " " + client.player.heading);
   }
-	 
+
   if(cmd == "race") {
     triggerNetworkEvent("clearweapons", client);
     raceEnd();
@@ -476,7 +471,7 @@ function raceChoose() {
 		thisResource.stop();
 		return false;
 	}
-	
+
   local thisGameRaces = [];
   local racesFileData = racesFile.readBytes(racesFile.length);
   local racesLines = split(racesFileData, "\r\n");
@@ -490,7 +485,7 @@ function raceChoose() {
       }
     }
   }
-  
+
 	local randomRaceID = random(0, thisGameRaces.len());
 	return thisGameRaces[randomRaceID];
 }
@@ -510,9 +505,9 @@ function raceLoad(raceName) {
 
 // ----------------------------------------------------------------------------
 
-function raceJoin(client) { 
+function raceJoin(client) {
   local spawnSlot = serverEvent.participants.len();
-  local startPos = Vec3(serverEvent.spawns[spawnSlot][0].x, serverEvent.spawns[spawnSlot][0].y, serverEvent.spawns[spawnSlot][0].z);  
+  local startPos = Vec3(serverEvent.spawns[spawnSlot][0].x, serverEvent.spawns[spawnSlot][0].y, serverEvent.spawns[spawnSlot][0].z);
   local tempRaceVehicle = gta.createVehicle(119, startPos, serverEvent.spawns[spawnSlot][1]);
 
   // A couple of ugly workarounds. I'll file bug reports. We should be able to set a player's position via server and avoid the delay with warping into a vehicle
@@ -530,13 +525,13 @@ function raceJoin(client) {
 
 // ----------------------------------------------------------------------------
 
-function raceStarted() { 
+function raceStarted() {
   foreach(i, v in serverEvent.participants) {
     local nextX = serverEvent.checkpoints[raceCP[v.index]+1][0].x;
     local nextY = serverEvent.checkpoints[raceCP[v.index]+1][0].y;
     local nextZ = serverEvent.checkpoints[raceCP[v.index]+1][0].z;
 
-    triggerNetworkEvent("makepoint", v, serverEvent.checkpoints[raceCP[v.index]][0].x, serverEvent.checkpoints[raceCP[v.index]][0].y, serverEvent.checkpoints[raceCP[v.index]][0].z, COLOUR_YELLOW, serverEvent.checkpoints[raceCP[v.index]][1], nextX, nextY, nextZ); 
+    triggerNetworkEvent("makepoint", v, serverEvent.checkpoints[raceCP[v.index]][0].x, serverEvent.checkpoints[raceCP[v.index]][0].y, serverEvent.checkpoints[raceCP[v.index]][0].z, COLOUR_YELLOW, serverEvent.checkpoints[raceCP[v.index]][1], nextX, nextY, nextZ);
     triggerNetworkEvent("engine", v, raceVehicle[v.index], true);
   }
 }
@@ -590,7 +585,7 @@ function raceEnd() {
 
 // ----------------------------------------------------------------------------
 
-function raceKick(client) { 
+function raceKick(client) {
   triggerNetworkEvent("removepoint", client);
 
   raceCP[client.index] = 0;
@@ -639,7 +634,7 @@ function saveAllPlayerStats() {
 // ----------------------------------------------------------------------------
 
 function saveRaceHighScores() {
-  
+
 }
 
 // ----------------------------------------------------------------------------
@@ -672,7 +667,7 @@ function returnToRaceVehicleCounter(client) {
       local timer = returnToRaceVehicle[client.index][0];
       clearInterval(timer);
       returnToRaceVehicle[client.index] = [false, 0];
-      raceKick(client);      
+      raceKick(client);
     } else {
       local remainingTime = returnToRaceVehicleTimeLimit-elapsedTime;
       messageClient("⚠️ You have " + remainingTime.tostring() + " seconds to return to your race car!", client, yellow);
